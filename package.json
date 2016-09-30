@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bower": "^1.7.9",
     "browser-sync": "^2.16.0",
     "gulp": "^3.9.1"
   }
