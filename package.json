@@ -4,16 +4,12 @@
   "description": "A remix tool using OER SChema",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules/.bin/browserify build.js -o src/app/build.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "angular": "^1.5.8",
-    "angular-drag-drop": "^3.0.5",
     "browser-sync": "^2.16.0",
-    "browserify": "^13.1.0",
     "gulp": "^3.9.1"
   }
 }
