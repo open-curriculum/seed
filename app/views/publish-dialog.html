@@ -1,0 +1,18 @@
+<md-dialog>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2 class="md-title">Publish</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="closeDialog()"><md-icon>close</md-icon></md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content layout-padding>
+        <code>
+            {{ content }}
+        </code>
+    </md-dialog-content>
+
+    <md-dialog-actions>
+        <md-button ng-click="closeDialog()" class="md-primary">Close</md-button>
+    </md-dialog-actions>
+</md-dialog>
