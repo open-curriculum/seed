@@ -144,18 +144,6 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
             $mdToast.showSimple(response.data.error || response.statusText);
         };
 
-        var tid = 0;
-        this.resizeImage = function(item) {
-            var f = function(o) {
-                o.width = o.newWidth;
-            };
-
-            var cb = f.bind(null, item);
-
-            clearTimeout(tid);
-            tid = setTimeout(cb, 200);
-        };
-
         this.remove = function(item) {
             if ((index = $scope.content.indexOf(item))) {
                 $scope.content.splice(index, 1);
