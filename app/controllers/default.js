@@ -10,7 +10,7 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
         $scope.resource = '';
         $scope.pageCache = {};
         $scope.querying = false;
-        $scope.contentHeader = 'Content';
+        $scope.contentHeader = 'Content Title';
 
         $scope.dragAssetsOptions = {
             clone: true
@@ -115,7 +115,7 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
 
                 if (!!item.content || !!item.image) {
                     item.weight = Object.keys($scope.assets).length;
-                    $scope.assets.push(item);
+                    $scope.assets.unshift(item);
                 }
             };
 
@@ -146,9 +146,7 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
 
         var tid = 0;
         this.resizeImage = function(item) {
-            console.log(item, tid);
             var f = function(o) {
-                console.log("Called!");
                 o.width = o.newWidth;
             };
 
@@ -156,11 +154,6 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
 
             clearTimeout(tid);
             tid = setTimeout(cb, 200);
-        };
-
-        this.initImage = function(item, img) {
-            item.width = img.width;
-            console.log(item, img);
         };
 
         this.remove = function(item) {

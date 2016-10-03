@@ -5,6 +5,7 @@
         <link rel="stylesheet" type="text/css" href="components/angular-material/angular-material.min.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="components/ng-sortable/dist/ng-sortable.min.css" rel="stylesheet">
+        <link href="components/angular-xeditable/dist/css/xeditable.min.css" rel="stylesheet">
         <style type="text/css">
             img.img-responsive {
                 display: block;
@@ -38,80 +39,89 @@
                 border: 1px solid lightgrey;
                 border-radius: 0;
                 display: inline-block;
+                margin-left: 5px;
+            }
+
+            .asset-item {
+                background: white;
             }
         </style>
     </head>
-    <body ng-controller="DefaultCtrl as default" layout="column">
+    <body ng-controller="DefaultCtrl as default" layout="row">
+        <md-sidenav md-is-locked-open="true">
+            <md-toolbar class="md-primary md-hue-3">
+                <div class="md-toolbar-tools">
+                    <h1>Assets</h1>
+                </div>
+            </md-toolbar>
+            <form name="resource_form" ng-submit="default.getResource()">
+                <div layout="row" layout-align="center center">
+                    <md-input-container class="md-block" flex>
+                        <input type="url" name="url" id="url" ng-model="resource" ng-disabled="querying" aria-label="Resource URL" placeholder="Resource URL">
+                    </md-input-container>
+                    <md-button type="submit" class="md-icon-button md-primary" ng-disabled="querying">
+                        <md-icon>add</md-icon>
+                        <md-tooltip md-placement="bottom">Add Resource</md-tooltip>
+                    </md-button>
+                </div>
+            </form>
+            <md-progress-linear md-mode="query" ng-disabled="!querying"></md-progress-linear>
+            <div id="assets">
+                <div as-sortable="dragAssetsOptions" data-ng-model="assets">
+                    <div ng-repeat="asset in assets" class="asset-item" data-as-sortable-item data-as-sortable-item-handle>
+                        <div layout="row" layout-padding>
+                            <div flex layout="column">
+                                <span class="md-subhead">{{ asset.title }}</span>
+                                <span class="md-caption">{{ asset.type }}</span>
+                                <p class="md-body-1">
+                                    {{ asset.content[0].substring(0, 50) }}...
+                                </p>
+                            </div>
+                            <div layout-padding>
+                                <img ng-if="asset.image" style="height:auto; max-width: 70px;" ng-src="{{ asset.image }}">
+                            </div>
+                        </div>
+                        <md-divider></md-divider>
+                    </div>
+                </div>
+            </div>
+        </md-sidenav>
+        <md-divider></md-divider>
         <md-content flex layout="column">
             <md-toolbar class="md-primary" md-scroll-shrink="true">
                 <div class="md-toolbar-tools">
                     <h1>SEED</h1>
+                    <span flex></span>
+                    <md-button class="md-raised" ng-click="publish()">Publish</md-button>
                 </div>
             </md-toolbar>
-            <md-subheader>
-                <form name="resource_form" ng-submit="default.getResource()" layout="row">
-                    <md-input-container class="md-block" flex>
-                        <input type="url" name="url" id="url" ng-model="resource" ng-disabled="querying" aria-label="Resource URL" placeholder="Resource URL">
-                    </md-input-container>
-                    <div>
-                        <md-button type="submit" class="md-icon-button md-primary md-raised" ng-disabled="querying">
-                            <md-icon>add</md-icon>
-                            <md-tooltip md-placement="bottom">Add Resource</md-tooltip>
-                        </md-button>
-                    </div>
-                </form>
-                <md-progress-linear md-mode="query" ng-disabled="!querying"></md-progress-linear>
-            </md-subheader>
-            <div id="assets" layout-padding md-colors="::{background: 'default-background-200'}" style="overflow-x: auto;">
-                <h3 class="md-title">Assets</h3>
-                <div layout="row" as-sortable="dragAssetsOptions" data-ng-model="assets">
-                    <md-card ng-repeat="asset in assets" data-as-sortable-item data-as-sortable-item-handle>
-                        <md-card-title>
-                            <md-card-title-text>
-                                <span class="md-title">{{ asset.title }}</span>
-                                <span class="md-subhead">{{ asset.type }}</span>
-                            </md-card-title-text>
-                            <md-card-title-media layout-padding>
-                                <div ng-if="asset.image" class="md-media-md" style="background: url('{{ asset.image }}') center center no-repeat scroll; background-size: contain;">
-                                    &nbsp;
-                                </div>
-                            </md-card-title-media>
-                        </md-card-title>
-                        <md-card-content layout-align="start center">
-                            <div ng-if="asset.content">
-                                {{ asset.content[0].substring(0, 50) }}...
-                            </div>
-                        </md-card-content>
-                    </md-card>
-                </div>
-            </div>
-            <div as-sortable="dragContentOptions" data-ng-model="content" flex layout-padding>
-                <input name="contentHeader" class="md-title" layout-padding data-ng-model="$parent.contentHeader" aria-label="Content Header">
+
+
+            <div as-sortable="dragContentOptions" data-ng-model="content" layout-padding flex>
+                <h1 contenteditable="true" ng-model="$parent.contentHeader"></h1>
                 <div id="content" layout="column" flex layout-padding sv-root sv-part="content">
                     <div ng-repeat="part in content" sv-element>
                         <figure ng-if="part.image" class="ctrl-container">
                             <div class="ctrl-controls">
+                                <input ng-model="content[$index].width" class="ctrl" placeholder="Width">
                                 <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon></md-button>
                             </div>
-                            <img ng-src="{{ part.image }}" draggable="false" class="img-responsive" width="{{ part.width }}" ng-init="default.initImage(part, this)">
-                            <figcaption ng-if="part.caption" ng-repeat="caption in part.caption" property="caption">{{ caption }}</figcaption>
+                            <img ng-src="{{ part.image }}" draggable="false" class="img-responsive" width="{{ part.width }}">
+                            <figcaption ng-if="part.caption" ng-repeat="caption in part.caption" property="caption"><span contenteditable="true" ng-model="content[$parent.$index].caption[$index]"></span></figcaption>
                         </figure>
                         <div ng-if="part.content" class="ctrl-container">
                             <div class="ctrl-controls">
                                 <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon></md-button>
                             </div>
-                            <h2 property="name">{{ part.title }}</h2>
+                            <h2 property="name" contenteditable="true" ng-model="content[$index].title"></h2>
                             <div ng-repeat="piece in part.content" drag-container="true" drag-data="piece">
-                                {{ piece }}
+                                <div contenteditable="true" ng-model="content[$parent.$index].content[$index]"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </md-content>
-        <div>
-            <md-button class="md-raised md-primary" ng-click="publish()">Publish</md-button>
-        </div>
 
         <script src="components/angular/angular.min.js"></script>
         <script src="components/angular-animate/angular-animate.min.js"></script>
