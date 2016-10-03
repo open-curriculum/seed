@@ -5,6 +5,41 @@
         <link rel="stylesheet" type="text/css" href="components/angular-material/angular-material.min.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="components/ng-sortable/dist/ng-sortable.min.css" rel="stylesheet">
+        <style type="text/css">
+            img.img-responsive {
+                display: block;
+                height: auto;
+                max-width: 100%;
+            }
+
+            .ctrl-container {
+                position: relative;
+            }
+
+            .ctrl-container:hover > .ctrl-controls {
+                display: block;
+            }
+
+            .ctrl-controls {
+                display: none;
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: white;
+                border: 1px solid grey;
+            }
+
+            .ctrl-controls > .ctrl {
+                display: inline-block;
+            }
+
+
+            input.ctrl {
+                border: 1px solid lightgrey;
+                border-radius: 0;
+                display: inline-block;
+            }
+        </style>
     </head>
     <body ng-controller="DefaultCtrl as default" layout="column">
         <md-content flex layout="column">
@@ -50,18 +85,23 @@
                     </md-card>
                 </div>
             </div>
-            <div as-sortable="dragContentOptions" data-ng-model="content" flex layout-padding vocab="http://oerschema.org/" typeof="Resource">
-                <h3 class="md-title" layout-padding contenteditable="true" property="name">Content</h3>
+            <div as-sortable="dragContentOptions" data-ng-model="content" flex layout-padding>
+                <input name="contentHeader" class="md-title" layout-padding data-ng-model="$parent.contentHeader" aria-label="Content Header">
                 <div id="content" layout="column" flex layout-padding sv-root sv-part="content">
                     <div ng-repeat="part in content" sv-element>
-                        <figure ng-if="part.image" typeof="ImageObject">
-                            <meta property="contentUrl" content="{{ part.image }}">
-                            <img ng-src="{{ part.image }}" draggable="false">
+                        <figure ng-if="part.image" class="ctrl-container">
+                            <div class="ctrl-controls">
+                                <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon></md-button>
+                            </div>
+                            <img ng-src="{{ part.image }}" draggable="false" class="img-responsive" width="{{ part.width }}" ng-init="default.initImage(part, this)">
                             <figcaption ng-if="part.caption" ng-repeat="caption in part.caption" property="caption">{{ caption }}</figcaption>
                         </figure>
-                        <div ng-if="part.content" typeof="{{ part.type }}">
-                            <h2 contenteditable="true" property="name">{{ part.title }}</h2>
-                            <div property="text" ng-repeat="piece in part.content" drag-container="true" drag-data="piece" contenteditable="true">
+                        <div ng-if="part.content" class="ctrl-container">
+                            <div class="ctrl-controls">
+                                <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon></md-button>
+                            </div>
+                            <h2 property="name">{{ part.title }}</h2>
+                            <div ng-repeat="piece in part.content" drag-container="true" drag-data="piece">
                                 {{ piece }}
                             </div>
                         </div>
@@ -69,6 +109,9 @@
                 </div>
             </div>
         </md-content>
+        <div>
+            <md-button class="md-raised md-primary" ng-click="publish()">Publish</md-button>
+        </div>
 
         <script src="components/angular/angular.min.js"></script>
         <script src="components/angular-animate/angular-animate.min.js"></script>

@@ -4,12 +4,13 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
         defaultFontSet('material-icons')
         ;
     }])
-    .controller('DefaultCtrl', ['$scope', '$http', '$mdDialog', '$mdToast', function ($scope, $http, $mdModal, $mdToast) {
+    .controller('DefaultCtrl', ['$scope', '$http', '$mdDialog', '$mdToast', function ($scope, $http, $mdDialog, $mdToast) {
         $scope.assets = [];
         $scope.content = [];
         $scope.resource = '';
         $scope.pageCache = {};
         $scope.querying = false;
+        $scope.contentHeader = 'Content';
 
         $scope.dragAssetsOptions = {
             clone: true
@@ -100,8 +101,8 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
                 if (!!d['@value']) {
                     item.value = d['@value'];
                 } else if (item.type == 'ImageObject') {
-                    if (!item.title) { item.title = d['@id'].match(/[^\/]+$/)[0]; }
-                    if (!item.image) { item.image = item.contentUrl && item.contentUrl[0] || d['@id'] };
+                    if (!item.title) { item.title = d['@id'].match(/[^\/]+$/)[0] }
+                    if (!item.image) { item.image = item.contentUrl && item.contentUrl[0] || d['@id'] }
                 }
                 /* For later use, once I get around CORS issues
                 else if (/#.*$/.test(d['@id']) && !!$scope.pageCache[url]) {
@@ -141,6 +142,85 @@ angular.module('app.controller.default', ['as.sortable', 'angular-sortable-view'
 
         var fail = function(response) {
             $mdToast.showSimple(response.data.error || response.statusText);
+        };
+
+        var tid = 0;
+        this.resizeImage = function(item) {
+            console.log(item, tid);
+            var f = function(o) {
+                console.log("Called!");
+                o.width = o.newWidth;
+            };
+
+            var cb = f.bind(null, item);
+
+            clearTimeout(tid);
+            tid = setTimeout(cb, 200);
+        };
+
+        this.initImage = function(item, img) {
+            item.width = img.width;
+            console.log(item, img);
+        };
+
+        this.remove = function(item) {
+            if ((index = $scope.content.indexOf(item))) {
+                $scope.content.splice(index, 1);
+            }
+        };
+
+        $scope.publish = function($event) {
+            $mdDialog.show({
+                targetEvent: $event,
+                templateUrl: 'app/views/publish-dialog.html',
+                escapeToClose: true,
+                clickOutsideToClose: true,
+                locals: {
+                    header: $scope.contentHeader,
+                    content: $scope.content
+                },
+                controller: ['$scope', '$mdDialog', 'header', 'content', function($scope, $mdDialog, header, content) {
+                    var output = '<div vocab="http://oerschema.org/" typeof="Resource">' +
+                        '<h1 property="name">' + header + '</h1>';
+
+                    angular.forEach(content, function(part) {
+                        if (!!part.image) {
+                            output += '<figure ng-if="part.image" typeof="ImageObject">' +
+                                '<meta property="contentUrl" content="' + part.image + '">' +
+                                '<img src="' + part.image + '" width="' + part.width + '" height="' + part.height + '">';
+
+                            if (!!part.caption) {
+                                angular.forEach(part.caption, function (caption) {
+                                    output += '<figcaption property="caption">' + caption + '</figcaption>';
+                                });
+                            }
+
+                            output += '</figure>';
+                        }
+
+                        if (!!part.content) {
+                            output += '<div typeof="' + part.type + '">' +
+                                '<h2 property="name">' + part.title + '</h2>';
+
+                            if (!!part.content) {
+                                angular.forEach(part.content, function(piece) {
+                                    output += '<div property="text" ng-repeat="piece in part.content">' + piece + '</div>';
+                                });
+                            }
+
+                            output += '</div>';
+                        }
+                    });
+
+                    output += '</div>';
+
+                    $scope.content = output;
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+                }]
+            });
         };
     }])
 ;

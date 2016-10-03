@@ -85,3 +85,4 @@ fabric.properties
 
 # App
 src/components
+_dist
