@@ -22,20 +22,16 @@
             }
 
             .ctrl-controls {
-                display: none;
-                position: absolute;
+                position: relative;
                 top: 0;
                 right: 0;
                 background: white;
                 border: 1px solid grey;
-            }
-
-            .ctrl-controls > .ctrl {
-                display: inline-block;
+                color: #9E9E9E;
             }
 
 
-            input.ctrl {
+            input.ctrl, .ctrl > input {
                 border: 1px solid lightgrey;
                 border-radius: 0;
                 display: inline-block;
@@ -101,18 +97,20 @@
                 <h1 contenteditable="true" ng-model="$parent.contentHeader"></h1>
                 <div id="content" layout="column" flex layout-padding sv-root sv-part="content">
                     <div ng-repeat="part in content" sv-element>
-                        <figure ng-if="part.image" class="ctrl-container">
-                            <div class="ctrl-controls">
-                                <input ng-model="content[$index].width" class="ctrl" placeholder="Width">
-                                <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon></md-button>
+                        <div class="ctrl-controls" layout="row" layout-align="start center">
+                            <span class="md-subhead" layout-padding>{{ part.type }}</span>
+                            <span flex></span>
+                            <div class="ctrl" ng-if="part.image">
+                                <label> Width: <input ng-model="content[$index].width"></label>
                             </div>
+                            <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon><md-tooltip md-placement="bottom">Remove</md-tooltip></md-button>
+                            <md-button class="md-icon-button" sv-handle><md-icon>open_with</md-icon><md-tooltip md-placement="bottom">Move</md-tooltip></md-button>
+                        </div>
+                        <figure ng-if="part.image" class="ctrl-container">
                             <img ng-src="{{ part.image }}" draggable="false" class="img-responsive" width="{{ part.width }}">
-                            <figcaption ng-if="part.caption" ng-repeat="caption in part.caption" property="caption"><span contenteditable="true" ng-model="content[$parent.$index].caption[$index]"></span></figcaption>
+                            <figcaption ng-if="part.caption" ng-repeat="caption in part.caption" property="caption"><span contenteditable="true" ng-model="part.caption[$index]">{{ caption }}</span></figcaption>
                         </figure>
                         <div ng-if="part.content" class="ctrl-container">
-                            <div class="ctrl-controls">
-                                <md-button class="ctrl md-icon-button" aria-label="Remove" ng-click="default.remove(this)"><md-icon>delete</md-icon></md-button>
-                            </div>
                             <h2 property="name" contenteditable="true" ng-model="content[$index].title"></h2>
                             <div ng-repeat="piece in part.content" drag-container="true" drag-data="piece">
                                 <div contenteditable="true" ng-model="content[$parent.$index].content[$index]"></div>
