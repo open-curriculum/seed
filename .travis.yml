@@ -4,7 +4,7 @@ node_js:
 install:
   - "npm install"
   - "bower install"
-after_success:
+script:
   - ./deploy.sh
 env:
   global:
